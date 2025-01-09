@@ -15,7 +15,7 @@ param appName string = 'app-${uniqueString(resourceGroup().id)}'
 
 @description('The SKU of the App Service plan to run the self-hosted integration runtime container.')
 param appServicePlanSku object = {
-  name: 'P2v3'
+  name: 'P1v3'
   capacity: 1
 }
 
