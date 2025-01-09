@@ -35,7 +35,7 @@ resource buildTask 'Microsoft.ContainerRegistry/registries/taskRuns@2019-06-01-p
       ]
       platform: {
         os: 'Windows'
-        architecture: 'x86'
+        architecture: 'amd64'
       }
     }
   }
