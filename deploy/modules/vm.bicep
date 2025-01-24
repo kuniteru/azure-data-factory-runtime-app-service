@@ -73,6 +73,11 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
         }
       ]
     }
+    priority: 'Spot'
+    evictionPolicy: 'Deallocate'
+    billingProfile: {
+      maxPrice: -1
+    }
   }
 
   resource installCustomScriptExtension 'extensions' = {
