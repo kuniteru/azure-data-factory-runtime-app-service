@@ -42,6 +42,15 @@ Next, initiate the deployment of the Bicep file. The only mandatory parameter is
 
 ```azurecli
 az deployment group create \
+  --resource-group SHIR \
+  --template-file deploy/main.bicep \
+  --parameters 'vmAdminPassword=<YOUR-VM-ADMIN-PASSWORD>' ['irNodeExpirationTime=<TIME-IN-SECONDS>']
+```
+
+If you want to deploy your original customized version of the Bicep file, you can use the following command:
+
+```azurecli
+az deployment group create \
   --resource-group ${RG} \
   --template-file deploy/main.my.bicep \
   --parameters 'applicationInsightsInstrumentationKey=${DFSHIR_AIIK}' 'applicationInsightsConnectionString=${DFSHIR_AICS}' 'dataFactoryAuthKey=${DFSHIR_DFAK}' ['irNodeExpirationTime=<TIME-IN-SECONDS>']
