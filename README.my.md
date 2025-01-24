@@ -31,16 +31,18 @@ The entire deployment is defined as a Bicep file, with a series of modules to de
 To run the deployment, first create a resource group, such as by using the following Azure CLI command:
 
 ```azurecli
+RG=shir-rg
+LOCATION=japaneast
 az group create \
-  --name SHIR \
-  --location australiaeast
+  --name ${RG} \
+  --location ${LOCATION}
 ```
 
 Next, initiate the deployment of the Bicep file. The only mandatory parameter is `vmAdminPassword`, which must be set to a value that conforms to the password naming rules for virtual machines. The following Azure CLI command initiates the deployment:
 
 ```azurecli
 az deployment group create \
-  --resource-group SHIR \
+  --resource-group ${RG} \
   --template-file deploy/main.my.bicep \
   --parameters 'applicationInsightsInstrumentationKey=${DFSHIR_AIIK}' 'applicationInsightsConnectionString=${DFSHIR_AICS}' 'dataFactoryAuthKey=${DFSHIR_DFAK}' ['irNodeExpirationTime=<TIME-IN-SECONDS>']
 ```
