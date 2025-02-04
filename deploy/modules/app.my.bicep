@@ -1,5 +1,5 @@
 @description('The name of the App Service plan to create.')
-param appServicePlanName string = 'shir-plan'
+param appServicePlanName string = '${appName}-asp'
 
 @description('The location into which the Azure resources should be deployed.')
 param location string
@@ -37,7 +37,7 @@ param dataFactoryIntegrationRuntimeName string
 */
 
 @description('The name of the node to create for the self-hosted integration runtime.')
-param dataFactoryIntegrationRuntimeNodeName string = 'AppServiceContainer'
+param dataFactoryIntegrationRuntimeNodeName string = appName
 
 @description('The port for nodes remote access.')
 param irNodeRemoteAccessPort int
@@ -45,7 +45,8 @@ param irNodeRemoteAccessPort int
 @description('The expiration time of offline nodes in seconds. The value should not be less than 600.')
 param irNodeExpirationTime int
 
-var managedIdentityName = 'SampleApp'
+@description('The name of the managed identity to use for the App Service application.')
+param appManagedIdentityName string
 
 resource containerRegistry 'Microsoft.ContainerRegistry/registries@2021-06-01-preview' existing = {
   name: containerRegistryName
@@ -77,11 +78,12 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2021-03-01' = {
   }
 }
 
-resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2018-11-30' = {
-  name: managedIdentityName
+resource appManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2018-11-30' = {
+  name: appManagedIdentityName
   location: location
 }
 
+/*
 module appAcrRoleAssignment 'acr-role-assignment.bicep' = {
   name: 'app-acr-role-assignment'
   params: {
@@ -89,6 +91,7 @@ module appAcrRoleAssignment 'acr-role-assignment.bicep' = {
     principalId: managedIdentity.properties.principalId
   }
 }
+*/
 
 resource app 'Microsoft.Web/sites@2021-03-01' = {
   name: appName
@@ -96,7 +99,7 @@ resource app 'Microsoft.Web/sites@2021-03-01' = {
   identity: {
     type: 'UserAssigned'
     userAssignedIdentities: {
-      '${managedIdentity.id}': {}
+      '${appManagedIdentity.id}': {}
     }
   }
   properties: {
@@ -180,13 +183,10 @@ resource app 'Microsoft.Web/sites@2021-03-01' = {
       ]
       // Use a user-assigned managed identity to connect to the container registry. (We still need the DOCKER_REGISTRY_SERVER_* settings in the appSettings array, though.)
       acrUseManagedIdentityCreds: true
-      acrUserManagedIdentityID: managedIdentity.properties.clientId
+      acrUserManagedIdentityID: appManagedIdentity.properties.clientId
 
       // The container image to deploy.
       windowsFxVersion: appWindowsFxVersion
     }
   }
-  dependsOn: [
-    appAcrRoleAssignment // Wait for the role assignment so the app can pull from the container registry.
-  ]
 }

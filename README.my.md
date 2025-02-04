@@ -34,7 +34,7 @@ To run the deployment, first create a resource group, such as by using the follo
 RG=shir-rg
 LOCATION=japaneast
 az group create \
-  --name ${RG} \
+  --name ${DFSHIR_RG} \
   --location ${LOCATION}
 ```
 
@@ -42,18 +42,28 @@ Next, initiate the deployment of the Bicep file. The only mandatory parameter is
 
 ```azurecli
 az deployment group create \
-  --resource-group ${RG} \
+  --resource-group ${DFSHIR_RG} \
   --template-file deploy/main.bicep \
   --parameters 'vmAdminPassword=<YOUR-VM-ADMIN-PASSWORD>' ['irNodeExpirationTime=<TIME-IN-SECONDS>']
 ```
 
-If you want to deploy your original customized version of the Bicep file, you can use the following command:
+If you already have Data Factory, Container Registory, Virtual Network, Application Insights, and, User Assigned Managed Identity properly set up and you want to deploy only app service and app service plan, you can use the following command:
 
 ```azurecli
+DFSHIR_APPNAME=shir-app
 az deployment group create \
-  --resource-group ${RG} \
+  --resource-group ${DFSHIR_RG} \
   --template-file deploy/main.my.bicep \
-  --parameters 'applicationInsightsInstrumentationKey=${DFSHIR_AIIK}' 'applicationInsightsConnectionString=${DFSHIR_AICS}' 'dataFactoryAuthKey=${DFSHIR_DFAK}' ['irNodeExpirationTime=<TIME-IN-SECONDS>']
+  --parameters \
+    "appName=${DFSHIR_APPNAME}" \
+    "applicationInsightsInstrumentationKey=${DFSHIR_AIIK}" \
+    "applicationInsightsConnectionString=${DFSHIR_AICS}" \
+    "dataFactoryAuthKey=${DFSHIR_DFAK}" \
+    "appOutboundSubnetResourceId=${DFSHIR_AOSRI}" \
+    "containerRegistryName=${DFSHIR_CRN}" \
+    "containerImageName=${DFSHIR_CIN}" \
+    "containerImageTag=${DFSHIR_CIT}" \
+    "appManagedIdentityName=${DFSHIR_AMIN}"
 ```
 
 where the optional parameter `irNodeExpirationTime` specifies the time in seconds when the offline nodes expire after App Service stops or restarts. The expired nodes will be removed automatically during next restarting. The minimum expiration time, as well as the default value, is 600 seconds (10 minutes).

@@ -2,10 +2,21 @@
 param location string = resourceGroup().location
 
 @description('The name of the container registry to create. This must be globally unique.')
-param containerRegistryName string = 'shir${uniqueString(resourceGroup().id)}'
+param containerRegistryName string
 
+@description('The name of the container image to build.')
+param containerImageName string
+
+@description('The tag of the container image to build.')
+param containerImageTag string
+
+/*
 @description('The name of the virtual network to create.')
 param vnetName string = 'shirdemo'
+*/
+
+@description('The resource ID of the subnet to use for outbound connections.')
+param appOutboundSubnetResourceId string
 
 /*
 @description('The name of the data factory to create. This must be globally unique.')
@@ -39,6 +50,9 @@ param irNodeRemoteAccessPort int = 8060
 @description('The expiration time of the offline nodes in seconds. The value should not be less than 600.')
 param irNodeExpirationTime int = 600
 
+@description('The name of the managed identity to use for the App Service application.')
+param appManagedIdentityName string
+
 
 /*
 @description('The name of the SKU to use when creating the virtual machine.')
@@ -55,6 +69,8 @@ param vmAdminUsername string = 'shirdemoadmin'
 param vmAdminPassword string
 */
 
+
+/*
 // Deploy the container registry and build the container image.
 module acr 'modules/acr.bicep' = {
   name: 'acr'
@@ -72,8 +88,6 @@ module vnet 'modules/vnet.bicep' = {
     location: location
   }
 }
-
-/*
 // Deploy a virtual machine with a private web server.
 var vmImageReference = {
   publisher: 'MicrosoftWindowsServer'
@@ -131,12 +145,13 @@ module app 'modules/app.my.bicep' = {
   params: {
     location: location
     appName: appName
-    appOutboundSubnetResourceId: vnet.outputs.appOutboundSubnetResourceId
+    appOutboundSubnetResourceId: appOutboundSubnetResourceId
     applicationInsightsInstrumentationKey: applicationInsightsInstrumentationKey
     applicationInsightsConnectionString: applicationInsightsConnectionString
-    containerRegistryName: acr.outputs.containerRegistryName
-    containerImageName: acr.outputs.containerImageName
-    containerImageTag: acr.outputs.containerImageTag
+    appManagedIdentityName: appManagedIdentityName
+    containerRegistryName: containerRegistryName
+    containerImageName: containerImageName
+    containerImageTag: containerImageTag
     //dataFactoryName: adf.outputs.dataFactoryName
     dataFactoryIntegrationRuntimeNodeName: dataFactoryIntegrationRuntimeNodeName
     dataFactoryAuthKey: dataFactoryAuthKey
