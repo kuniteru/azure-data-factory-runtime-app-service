@@ -31,7 +31,7 @@ The entire deployment is defined as a Bicep file, with a series of modules to de
 To run the deployment, first create a resource group, such as by using the following Azure CLI command:
 
 ```azurecli
-RG=shir-rg
+DFSHIR_RG=shir-rg
 LOCATION=japaneast
 az group create \
   --name ${DFSHIR_RG} \
@@ -64,6 +64,19 @@ az deployment group create \
     "containerImageName=${DFSHIR_CIN}" \
     "containerImageTag=${DFSHIR_CIT}" \
     "appManagedIdentityName=${DFSHIR_AMIN}"
+```
+
+If you want to only build task in ACR, you can use the following command:
+
+```azurecli
+DFSHIR_ACR_NAME=shir-acr
+DFSHIR_CIT="v3-$(date +%Y%m%d)"
+az deployment group create \
+  --resource-group ${DFSHIR_RG} \
+  --template-file deploy/modules/acr-build-task.my.bicep \
+  --parameters \
+    "acrName=${DFSHIR_ACR_NAME}" \
+    "containerImageTag=${DFSHIR_CIT}"
 ```
 
 where the optional parameter `irNodeExpirationTime` specifies the time in seconds when the offline nodes expire after App Service stops or restarts. The expired nodes will be removed automatically during next restarting. The minimum expiration time, as well as the default value, is 600 seconds (10 minutes).
