@@ -26,6 +26,9 @@ param dataFactoryName string = 'shirdemo${uniqueString(resourceGroup().id)}'
 @description('The name of the App Service application to create. This must be globally unique.')
 param appName string = 'app-${uniqueString(resourceGroup().id)}'
 
+@description('The name of the App Service plan to create.')
+param appServicePlanName string = '${appName}-asp'
+
 @description('The SKU of the App Service plan to run the self-hosted integration runtime container.')
 param appServicePlanSku object = {
   name: 'P1v3'
@@ -145,6 +148,7 @@ module app 'modules/app.my.bicep' = {
   params: {
     location: location
     appName: appName
+    appServicePlanName: appServicePlanName
     appOutboundSubnetResourceId: appOutboundSubnetResourceId
     applicationInsightsInstrumentationKey: applicationInsightsInstrumentationKey
     applicationInsightsConnectionString: applicationInsightsConnectionString

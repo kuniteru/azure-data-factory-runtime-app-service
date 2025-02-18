@@ -145,6 +145,11 @@ resource app 'Microsoft.Web/sites@2021-03-01' = {
           value: containerRegistry.listCredentials().passwords[0].value
         }
         {
+          // The memory limit for the container.
+          name: 'WEBSITE_MEMORY_LIMIT_MB'
+          value: '2048'
+        }
+        {
           // Disable persistent storage because we don't need it.
           name: 'WEBSITES_ENABLE_APP_SERVICE_STORAGE'
           value: 'false'
@@ -179,6 +184,10 @@ resource app 'Microsoft.Web/sites@2021-03-01' = {
         {
           name: 'AE_TIME'
           value: '${irNodeExpirationTime}'
+        }
+        {
+          name: 'INSTALL_JDK'
+          value: 'true'
         }
       ]
       // Use a user-assigned managed identity to connect to the container registry. (We still need the DOCKER_REGISTRY_SERVER_* settings in the appSettings array, though.)

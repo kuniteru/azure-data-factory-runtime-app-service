@@ -11,10 +11,10 @@ param location string  = resourceGroup().location
 param containerImageName string = 'adf/shir'
 
 @description('The tag of the container image to create.')
-param containerImageTag string
+param containerImageTag string = 'v3'
 
 @description ('The URL of the Git repository containing the Dockerfile to build the container image.')
-param dockerfileSourceGitRepository string = 'https://github.com/Azure/Azure-Data-Factory-Integration-Runtime-in-Windows-Container.git'
+param dockerfileSourceGitRepository string = 'https://github.com/kuniteru/Azure-Data-Factory-Integration-Runtime-in-Windows-Container.git'
 
 resource containerRegistry 'Microsoft.ContainerRegistry/registries@2021-06-01-preview' = {
   name: acrName
